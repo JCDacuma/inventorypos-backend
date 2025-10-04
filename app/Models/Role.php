@@ -14,6 +14,7 @@ class Role extends Model
         'can_order_supplies',
         'can_delete',
         'is_admin',
+        'status'
     ];
 
     protected $casts = [

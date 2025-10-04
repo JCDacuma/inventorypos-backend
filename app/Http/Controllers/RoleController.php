@@ -12,7 +12,7 @@ class RoleController extends Controller
      */
     public function index()
     {
-        $roles = Role::all();
+        $roles = Role::where('status', '!=', 'Deleted')->get();
         return response()->json($roles);
     }
 
@@ -30,6 +30,7 @@ class RoleController extends Controller
                 'can_order_supplies'=>'boolean',
                 'can_delete' => 'boolean',
                 'is_admin'=>'boolean',
+                'status' => 'string',
             ]
         );
 
@@ -50,7 +51,25 @@ class RoleController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $role = Role::findOrFail($id);
+
+        $validated = $request -> validate([
+            'role_name' => 'sometimes|required|string|max:255',
+            'can_edit_price'=>'sometimes|boolean',
+            'can_edit_item_info'=>'sometimes|boolean',
+            'can_edit_stocks'=>'sometimes|boolean',
+            'can_order_supplies'=>'sometimes|boolean',
+            'can_delete' => 'sometimes|boolean',
+            'is_admin'=>'sometimes|boolean',
+            'status' => 'sometimes|string',
+        ]);
+
+        $role->update( $validated );
+
+        return response()->json([
+            "message" => "role has been update",
+            "role" =>  $role
+        ], 200);
     }
 
     /**

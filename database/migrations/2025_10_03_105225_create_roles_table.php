@@ -20,6 +20,7 @@ return new class extends Migration
             $table->boolean("can_order_supplies")->default(false);
             $table->boolean("can_delete")->default(false);
             $table->boolean("is_admin")->default(false);
+            $table->string("status")->default("active");
             $table->timestamps();
         });
     }
