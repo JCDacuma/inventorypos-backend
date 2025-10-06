@@ -15,6 +15,15 @@ class RoleController extends Controller
         $roles = Role::where('status', '!=', 'Deleted')->get();
         return response()->json($roles);
     }
+    /**
+     * Check Rolename is exist
+     */
+    public function checkRole(Request $request){
+        $role = $request->input('rolename');
+        $exists = Role::where('role_name', $role)->where('status','!=','Deleted')->exists();
+
+        return response()->json(['exists' => $exists]);
+    }
 
     /**
      * Store a newly created resource in storage.

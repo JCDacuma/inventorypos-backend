@@ -25,4 +25,9 @@ class Role extends Model
         'can_delete'=> 'boolean',
         'is_admin' => 'boolean',
     ];
+
+    public function users(){
+      return  $this -> hasMany(User::class, 'role_id');
+    }
+
 }
