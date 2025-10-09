@@ -7,6 +7,8 @@ use App\Http\Controllers\ContactController;
 use App\Http\Controllers\SupplierController;
 
 Route::apiResource('supplier', SupplierController::class ); //crud Supplier
+Route::post('supplier/check-supliername', [SupplierController::class, 'checkSuppliername']); //Check supplier
+
 Route::apiResource('contact', ContactController::class); //crud Contact
 
 Route::apiResource('account', UserController::class); //crud role

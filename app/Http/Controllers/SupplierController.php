@@ -80,4 +80,12 @@ class SupplierController extends Controller
     {
         //
     }
+
+    //check availability suppliername
+    public function checkSuppliername(Request $request){
+        $supplierInput = $request->input('suppliername');
+        $exists = Supplier::where('suppliername', $supplierInput)->exists();
+
+        return response()->json(['exists'=> $exists]);
+    }
 }
