@@ -19,7 +19,13 @@ class Supplier extends Model
         'vat_registered' => 'boolean',
     ];
 
+    protected $appends = ['name_contact'];
+
     public function contact(){
         return $this -> belongsTo(SupplierContact::class, 'supplier_contact_id');
+    }
+
+    public function getNameContactAttribute(){
+        return $this->contact ? $this->contact->firstname . ' ' . $this->contact->lastname : null;
     }
 }

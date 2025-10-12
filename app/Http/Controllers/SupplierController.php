@@ -12,8 +12,8 @@ class SupplierController extends Controller
     public function index()
     {
         $supplier = Supplier::all();
-        return response()->json( $supplier);
-    }
+        return response()->json($supplier);
+        }
 
     /**
      * Show the form for creating a new resource.
@@ -91,6 +91,38 @@ class SupplierController extends Controller
         return response()->json(['message' => 'Supplier Successfully updated', 'supplier' => $supplier ], 200);
     }
 
+    public function bulkUpdate(Request $request){
+        $validated = $request->validate([
+            'request'=>'required|array',
+            'request.*.id'=>'required|integer|exists:suppliers,id',
+            'request.*.supplier_contact_id'=>'sometimes|integer|exists:supplier_contacts,id',
+            'request.*.status'=>'sometimes|string|max:255',
+            'request.*.vat_registered' => 'sometimes|boolean'
+        ]);
+
+        $countupdated = 0;
+
+        foreach($validated['request'] as $supplierData){
+            $supplier = Supplier::find($supplierData['id']);
+
+            if($supplier){
+                $supplier->fill(array_filter(
+                [
+                'supplier_contact_id'=>$supplierData['supplier_contact_id'] ?? null,
+                'status'=>$supplierData['status'] ?? null,
+                'vat_registered'=>$supplierData['vat_registered'] ?? null
+                ], fn($f)=>!is_null($f)
+            ));
+            $supplier->save();
+            $countupdated++;
+            }
+            
+        }
+        return response()->json(['message' => "supplier has successfully registerd: {$countupdated}"]);
+    }
+
+    
+
     /**
      * Remove the specified resource from storage.
      */
@@ -105,5 +137,12 @@ class SupplierController extends Controller
         $exists = Supplier::where('suppliername', $supplierInput)->exists();
 
         return response()->json(['exists'=> $exists]);
+    }
+
+    public function getEditSupplier(Request $request){
+        $id = $request->input('id');
+        $supplier = Supplier::findOrFail($id);
+
+        return response()->json($supplier);
     }
 }
