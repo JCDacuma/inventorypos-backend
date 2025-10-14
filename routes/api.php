@@ -5,14 +5,14 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\ProductCategoryController;
 
+Route::apiResource('category', ProductCategoryController::class);
 
 Route::post('supplier/check-supliername', [SupplierController::class, 'checkSuppliername']); //Check supplier
 Route::post('supplier/get-supplier', [SupplierController::class, 'getEditSupplier']); //get supplier by id
 Route::patch('supplier/bulk-update', [SupplierController::class, 'bulkUpdate']);
 Route::apiResource('supplier', SupplierController::class ); //crud Supplier
-
-
 
 Route::apiResource('contact', ContactController::class); //crud Contact
 

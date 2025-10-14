@@ -11,7 +11,7 @@ class SupplierController extends Controller
      */
     public function index()
     {
-        $supplier = Supplier::all();
+        $supplier = Supplier::whereNotIn('status',['Archieved', 'Deleted'])->get();
         return response()->json($supplier);
         }
 
