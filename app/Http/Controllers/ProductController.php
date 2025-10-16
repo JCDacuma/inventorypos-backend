@@ -22,72 +22,80 @@ class ProductController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
-    {
-        //
-    }
-
+   
     /**
      * Store a newly created resource in storage.
      */
-      public function store(Request $request)
-    {
-        try{
-             $validated = $request->validate([
+ public function store(Request $request)
+{
+    DB::beginTransaction();
+
+    try {
+        $validated = $request->validate([
+            'productcode' => 'required|string|unique:products,product_code',
             'productimage' => 'required|image|mimes:jpg,jpeg,png|max:2048',
             'productname' => 'required|string|max:150|unique:products,productname',
             'category' => 'required|integer|exists:product_categories,id',
+            'productunit' => 'required|integer|exists:product_units,id',
             'rawprice' => 'required|numeric|min:0',
             'markupprice' => 'required|numeric|min:0',
             'sellingprice' => 'required|numeric|min:0',
-            'istaxable' => 'sometimes|boolean',
-            'status' => 'sometimes|string',
-            'unit' => 'required|string|max:50',
+            'istaxable' => 'nullable|boolean',
+            'status' => 'nullable|string|in:Active,Inactive',
             'reorderlevel' => 'required|integer|min:0',
-            'description' => 'required|string|max:255',
+            'description' => 'nullable|string|max:255',
         ]);
 
-        $imagename = null;
+        $imagename = $request->file('productimage')->store('productimage', 'public');
 
-        if($request->hasFile('productimage')){
-            $image = $request->file('productimage');
-            $imagename = time() . '_' . str_replace(' ', '_', $image->getClientOriginalName());
-            $image->storeAs('productimage',$imagename, 'public');
+        $product = Product::create([
+            'product_code' => $validated['productcode'],
+            'product_image' => $imagename,
+            'productname' => $validated['productname'],
+            'category_id' => $validated['category'],
+            'unit_id' => $validated['productunit'],
+            'markup_price' => $validated['markupprice'],
+            'raw_price' => $validated['rawprice'],
+            'selling_price' => $validated['sellingprice'],
+            'taxable' => $request->boolean('istaxable'),
+            'product_status' => $validated['status'] ?? 'Active',
+            'reorder_level' => $validated['reorderlevel'],
+            'description' => $validated['description'],
+        ]);
+
+        DB::commit();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Product successfully registered',
+            'product' => $product
+        ], 201);
+
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        DB::rollBack();
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Validation error',
+            'errors' => $e->errors(),
+        ], 422);
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+
+        if (isset($imagename) && Storage::disk('public')->exists($imagename)) {
+            Storage::disk('public')->delete($imagename);
         }
 
-        DB::beginTransaction();
-
-            $product = Product::create([
-            'product_image'=> $imagename,
-            'productname'=> $validated['productname'],
-            'category_id'=> $validated['category'],
-            'markup_price'=> $validated['markupprice'],
-            'raw_price'=> $validated['rawprice'],
-            'selling_price'=> $validated['sellingprice'],
-            'taxable'=> $validated['istaxable'] ?? false,
-            'product_status'=> $validated['status'] ?? 'Active',
-            'unit'=> $validated['unit'],
-            'reorder_level'=> $validated['reorderlevel'],
-            'description'=> $validated['description'],
-            ]);
-
-            DB::commit();
-
-            return response()->json(['success' => true , 'message' => 'successfully registered product', 'product'=>$product], 201);
-        }
-        catch(ValidationException $e){
-            return response()->json(['success' => false , 'message' => 'Invalid Input, There is error in your input'], 422);
-        }
-        catch(\Exception $e){
-            DB::rollBack();
-
-            if($imagename && Storage::disk('public')->exists('productimage/' . $imagename)){
-                Storage::disk('public')->delete('productimage/' . $imagename);
-            }
-
-            return response()->json(['success' => false, 'message'=> 'failed to register product', 'error'=> $e->getMessage()],500);
-        }
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to register product',
+            'error' => $e->getMessage(),
+        ], 500);
     }
+}
+
+
 
     /**
      * Display the specified resource.
@@ -120,4 +128,8 @@ class ProductController extends Controller
     {
         //
     }
+
+    
 }
+
+

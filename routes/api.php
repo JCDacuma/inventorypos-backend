@@ -7,10 +7,12 @@ use App\Http\Controllers\ContactController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\ProductCategoryController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProductUnitController;
 
-//product category
+//product
 Route::apiResource('product', ProductController::class);
-
+//Product unit
+Route::apiResource('productunit', ProductUnitController::class);
 //product category
 Route::apiResource('category', ProductCategoryController::class);
 
