@@ -12,9 +12,12 @@ use App\Http\Controllers\ProductUnitController;
 //product
 Route::apiResource('product', ProductController::class);
 //Product unit
+Route::patch('productunit-delete/{id}', [ProductUnitController::class, 'softdelete']);
 Route::apiResource('productunit', ProductUnitController::class);
 //product category
+Route::patch('productcategory-delete/{id}', [ProductCategoryController::class, 'softdelete']);
 Route::apiResource('category', ProductCategoryController::class);
+
 
 //supplier
 Route::post('supplier/check-supliername', [SupplierController::class, 'checkSuppliername']); //Check supplier
