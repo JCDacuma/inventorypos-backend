@@ -10,6 +10,8 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductUnitController;
 
 //product
+
+Route::post('product-get/{id}', [ProductController::class, 'getEditProduct']);
 Route::apiResource('product', ProductController::class);
 //Product unit
 Route::patch('productunit-delete/{id}', [ProductUnitController::class, 'softdelete']);
