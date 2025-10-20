@@ -10,7 +10,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductUnitController;
 
 //product
-
+Route::patch('product-batchupdate', [ProductController::class, 'batchupdate']);
 Route::post('product-get/{id}', [ProductController::class, 'getEditProduct']);
 Route::apiResource('product', ProductController::class);
 //Product unit
