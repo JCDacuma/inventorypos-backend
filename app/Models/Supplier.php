@@ -25,6 +25,13 @@ class Supplier extends Model
         return $this -> belongsTo(SupplierContact::class, 'supplier_contact_id');
     }
 
+    public function products()
+{
+    return $this->belongsToMany(Product::class, 'product_suppliers')
+        ->withPivot('status')
+        ->withTimestamps();
+}
+
     public function getNameContactAttribute(){
         return $this->contact ? $this->contact->firstname . ' ' . $this->contact->lastname : null;
     }

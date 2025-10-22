@@ -28,12 +28,19 @@ class Product extends Model
     protected $appends = ['product_category', 'unit_symbol'];
 
    public function category()
-{
-    return $this->belongsTo(ProductCategory::class, 'category_id');
-}
+    {
+        return $this->belongsTo(ProductCategory::class, 'category_id');
+    }
 
     public function unit(){
     return $this->belongsTo(ProductUnit::class, 'unit_id');
+    }
+
+    public function suppliers(){
+        return $this->belongsToMany(Supplier::class, 'product_suppliers')
+        ->withPivot('status')
+        ->wherePivot('status','Active')
+        ->withTimestamps();
     }
 
     //append

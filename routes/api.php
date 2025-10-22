@@ -8,6 +8,13 @@ use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\ProductCategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductUnitController;
+use App\Http\Controllers\ProductSupplierController;
+
+
+//ProducSupplier pivot
+Route::get('product/{id}/supplier', [ProductSupplierController::class ,'getSupplierFromProduct']);
+Route::post('supplier-assign', [ProductSupplierController::class, 'AssignProductToSupplier']);
+Route::post('supplier-unnasign', [ProductSupplierController::class, 'unassignProductToSupplier']);
 
 //product
 Route::patch('product-batchupdate', [ProductController::class, 'batchupdate']);
