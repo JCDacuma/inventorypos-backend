@@ -12,6 +12,9 @@ use App\Http\Controllers\ProductSupplierController;
 
 
 //ProducSupplier pivot
+Route::post('bulk/supplier-assign',[ProductSupplierController::class, 'bulkSupplierAssign']);
+Route::post('products/suppliers/bulk', [ProductSupplierController::class, 'supplierFromBulkProduct']);
+Route::get('get/{id}/unnasigned-supplier' , [ProductSupplierController::class, 'getUnassignedSuppliers']);
 Route::get('product/{id}/supplier', [ProductSupplierController::class ,'getSupplierFromProduct']);
 Route::post('supplier-assign', [ProductSupplierController::class, 'AssignProductToSupplier']);
 Route::post('supplier-unnasign', [ProductSupplierController::class, 'unassignProductToSupplier']);
@@ -20,19 +23,21 @@ Route::post('supplier-unnasign', [ProductSupplierController::class, 'unassignPro
 Route::patch('product-batchupdate', [ProductController::class, 'batchupdate']);
 Route::post('product-get/{id}', [ProductController::class, 'getEditProduct']);
 Route::apiResource('product', ProductController::class);
+
 //Product unit
 Route::patch('productunit-delete/{id}', [ProductUnitController::class, 'softdelete']);
 Route::apiResource('productunit', ProductUnitController::class);
+
 //product category
 Route::patch('productcategory-delete/{id}', [ProductCategoryController::class, 'softdelete']);
 Route::apiResource('category', ProductCategoryController::class);
-
 
 //supplier
 Route::post('supplier/check-supliername', [SupplierController::class, 'checkSuppliername']); //Check supplier
 Route::post('supplier/get-supplier', [SupplierController::class, 'getEditSupplier']); //get supplier by id
 Route::patch('supplier/bulk-update', [SupplierController::class, 'bulkUpdate']);
 Route::apiResource('supplier', SupplierController::class ); //crud Supplier
+
 //supplier contact
 Route::apiResource('contact', ContactController::class); //crud Contact
 

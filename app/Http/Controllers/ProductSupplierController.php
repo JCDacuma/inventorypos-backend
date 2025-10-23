@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Supplier;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rules\Exists;
 
 class ProductSupplierController extends Controller
 {
@@ -34,10 +35,27 @@ class ProductSupplierController extends Controller
         return response()->json(['message' => 'successfully assigned product']);
     }
 
+    /* ========================= bulk supplier assignment to the selected product ============================ */
+        public function bulkSupplierAssign(Request $request){
+        $validated = $request->validate([
+            'request'=>'required|array',
+            'request.*.supplier_id' => 'required|exists:suppliers,id',
+            'request.*.product_id'  => 'required|exists:products,id',
+        ]);
+
+        $supplierId = $validated['request'][0]['supplier_id'];
+        $supplier = Supplier::findOrFail($supplierId );
+
+        foreach($validated['request'] as $requestData){
+            $productId = $requestData['product_id'];
+
+            $supplier->products()->syncWithoutDetaching([$productId => ['status' => 'Active']]);
+        }
+        return response()->json(['message' => 'successfully registered supplier']);
+    }
 
 
-
-    /* --------------- Unnasign product to supplier  --------------- */
+    /* ==================== Unnasign product to supplier  ======================= */
 
         public function unassignProductToSupplier(Request $request)
         {
@@ -73,30 +91,66 @@ class ProductSupplierController extends Controller
         }
 
      
-    /* --------------- Get suppliers with Active status in products  --------------- */
+    /* ================= Get suppliers with Active status in Selected Product  ================= */
 
-public function getSupplierFromProduct($productId)
-{
-    $product = Product::with('suppliers')->findOrFail($productId);
+            public function getSupplierFromProduct($productId)
+            {
+                $product = Product::with('suppliers')->findOrFail($productId);
 
-    $suppliers = $product->suppliers->map(function ($supplier) {
-        return [
-            'id' => $supplier->id,
-            'suppliername' => $supplier->suppliername,
-            'shipping_fee' => $supplier->shipping_fee,
-            'supplier_address' => $supplier->supplier_address,
-            'supplier_contact' => $supplier->name_contact,
-            'supplier_status' => $supplier->pivot->status,
-            'supplierVatStatus' => $supplier->vat_registered,
-        ];
-    });
+                $suppliers = $product->suppliers->map(function ($supplier) {
+                    return [
+                        'id' => $supplier->id,
+                        'suppliername' => $supplier->suppliername,
+                        'shipping_fee' => $supplier->shipping_fee,
+                        'supplier_address' => $supplier->supplier_address,
+                        'supplier_contact' => $supplier->name_contact,
+                        'supplier_status' => $supplier->pivot->status,
+                        'supplierVatStatus' => $supplier->vat_registered,
+                    ];
+                });
 
-    return response()->json([
-        'product_id' => $product->id,
-        'productname' => $product->productname,
-        'suppliers' => $suppliers,
-    ]);
-}
+                return response()->json([
+                    'product_id' => $product->id,
+                    'productname' => $product->productname,
+                    'suppliers' => $suppliers,
+                ]);
+            }
+
+
+        /* ================= Get unnasigne supplier for the Selected product ================ */
+            public function getUnassignedSuppliers($productId)
+            {
+                $product = Product::findOrFail($productId);
+
+                $suppliers = Supplier::whereDoesntHave('products', function($query) use ($product) {
+                    $query->where('product_id', $product->id);
+                })
+                ->orWhereHas('products', function($query) use ($product) {
+                    $query->where('product_id', $product->id)
+                        ->where('product_suppliers.status', 'Removed');
+                })
+                ->with('contact')
+                ->get();
+
+                return response()->json(['supplier' => $suppliers]);
+            }
+
+
+        /* ================= Get assigned supplier for bulk Selected product ================ */
+            public function supplierFromBulkProduct(Request $request){
+                $validated = $request->validate([
+                    'product_ids' => 'required|array',
+                    'product_ids.*' => 'exists:products,id'
+                ]);
+
+                $productIds = $validated['product_ids'];
+
+                $suppliers = Supplier::whereHas('products', function ($query) use ($productIds){
+                    $query->whereIn('product_id',$productIds)->where('product_suppliers.status','Active');
+                })->with(['contact'])->get();
+
+                return response()->json(["supplier" => $suppliers]);
+            }
 
 
 
