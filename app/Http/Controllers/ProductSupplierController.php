@@ -55,6 +55,35 @@ class ProductSupplierController extends Controller
     }
 
 
+  public function bulkSupplierUnnasign(Request $request)
+    {
+        $validated = $request->validate([
+            'request' => 'required|array',
+            'request.*.supplier_id' => 'required|exists:suppliers,id',
+            'request.*.product_id' => 'required|exists:products,id',
+        ]);
+
+        $supplierId = $validated['request'][0]['supplier_id'];
+        $supplier = Supplier::findOrFail($supplierId);
+
+        foreach ($validated['request'] as $requestData) {
+            $productId = $requestData['product_id'];
+
+            $exists = $supplier->products()
+                ->where('product_id', $productId)
+                ->first();
+
+            if ($exists) {
+                $supplier->products()->updateExistingPivot($productId, ['status' => 'Removed']);
+            } else {
+                continue;
+            }
+        }
+
+        return response()->json(['message' => 'Successfully unnasigned selected products']);
+    }
+
+
     /* ==================== Unnasign product to supplier  ======================= */
 
         public function unassignProductToSupplier(Request $request)
@@ -117,7 +146,7 @@ class ProductSupplierController extends Controller
             }
 
 
-        /* ================= Get unnasigne supplier for the Selected product ================ */
+        /* ================= Get unnasigned supplier for the Selected product ================ */
             public function getUnassignedSuppliers($productId)
             {
                 $product = Product::findOrFail($productId);

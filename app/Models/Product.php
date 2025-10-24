@@ -43,6 +43,12 @@ class Product extends Model
         ->withTimestamps();
     }
 
+    public function allSuppliers(){
+        return $this->belongsToMany(Supplier::class, 'product_suppliers')
+        ->withPivot('status')
+        ->withTimestamps();
+    }
+
     //append
     public function getProductCategoryAttribute(){
         return $this ->category ? $this->category->category_name : null;

@@ -10,14 +10,14 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductUnitController;
 use App\Http\Controllers\ProductSupplierController;
 
-
 //ProducSupplier pivot
-Route::post('bulk/supplier-assign',[ProductSupplierController::class, 'bulkSupplierAssign']);
-Route::post('products/suppliers/bulk', [ProductSupplierController::class, 'supplierFromBulkProduct']);
-Route::get('get/{id}/unnasigned-supplier' , [ProductSupplierController::class, 'getUnassignedSuppliers']);
-Route::get('product/{id}/supplier', [ProductSupplierController::class ,'getSupplierFromProduct']);
-Route::post('supplier-assign', [ProductSupplierController::class, 'AssignProductToSupplier']);
-Route::post('supplier-unnasign', [ProductSupplierController::class, 'unassignProductToSupplier']);
+Route::post('bulk-supplier-unnasign',[ProductSupplierController::class, 'bulkSupplierUnnasign']); //updating
+Route::post('bulk/supplier-assign',[ProductSupplierController::class, 'bulkSupplierAssign']); //updating
+Route::post('supplier-unnasign', [ProductSupplierController::class, 'unassignProductToSupplier']); //updating
+Route::post('supplier-assign', [ProductSupplierController::class, 'AssignProductToSupplier']); //updating
+Route::post('products/suppliers/bulk', [ProductSupplierController::class, 'supplierFromBulkProduct']); //getting
+Route::get('get/{id}/unnasigned-supplier' , [ProductSupplierController::class, 'getUnassignedSuppliers']); //getting
+Route::get('product/{id}/supplier', [ProductSupplierController::class ,'getSupplierFromProduct']); //getting
 
 //product
 Route::patch('product-batchupdate', [ProductController::class, 'batchupdate']);

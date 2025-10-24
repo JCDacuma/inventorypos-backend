@@ -16,13 +16,21 @@ class ProductController extends Controller
      * Display a listing of the resource.
      */
     public function index()
-    {
-        $product = Product::whereNotIn('product_status',['Archived', 'Deleted'])->get()->map(function($item){
-            $item->product_image_url = asset('storage/'.$item->product_image);
+{
+    $products = Product::whereNotIn('product_status', ['Archived', 'Deleted'])
+        ->withCount([
+    'allSuppliers as active_supplier_count' => function($query){
+        $query->where('product_suppliers.status', 'Active');
+    },
+        ])->get()
+        ->map(function ($item) {
+            $item->product_image_url = asset('storage/' . $item->product_image);
             return $item;
         });
-        return response()->json($product);
-    }
+
+    return response()->json($products);
+}
+
 
    public function getEditProduct($id)
     {
