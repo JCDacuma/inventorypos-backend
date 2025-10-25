@@ -12,6 +12,7 @@ use App\Http\Controllers\ProductSupplierController;
 use App\Http\Controllers\BatchStockController;
 
 //inventory
+Route::get('getproduct{id}/stocks', [BatchStockController::class, 'getStockBatchById']);
 Route::get('get-inventory', [BatchStockController::class, 'getInventoryDisplay']);
 
 

@@ -17,43 +17,64 @@ class BatchStockController extends Controller
         //
     }
 
-//inventory 
-   public function getInventoryDisplay()
-{
-    $products = Product::select(
-            'id',
-            'product_code',
-            'productname',
-            'selling_price',
-            'category_id',
-            'unit_id',
-            'product_status',
-            'reorder_level',
-        )
-        ->with([
-            'category:id,category_name',
-            'unit:id,symbol',
-        ])
-        ->withSum(['productStocks as total_quantity' => function ($query) {
-            $query->where('status', 'Active');
-        }], 'quantity')
-        ->withMax(['productStocks as last_movement' => function ($query) {
-            $query->where('status', 'Active');
-        }], 'last_moved')
-        ->whereNotIn('product_status', ['Deleted'])
-        ->get();
+    public function getStockBatchById(Request $request){
+        
+    }
 
-         
+
+    //inventory 
+   public function getInventoryDisplay()
+    {
+        $products = Product::select(
+                'id',
+                'product_code',
+                'productname',
+                'selling_price',
+                'category_id',
+                'unit_id',
+                'product_status',
+                'reorder_level',
+            )
+            ->with([
+                'category:id,category_name',
+                'unit:id,symbol',
+            ])
+            ->withSum(['productStocks as total_quantity' => function ($query) {
+                $query->where('status', 'Active');
+            }], 'quantity')
+            ->withMax(['productStocks as last_movement' => function ($query) {
+                $query->where('status', 'Active');
+            }], 'last_moved')
+            ->whereNotIn('product_status', ['Deleted'])
+            ->get();
+
         $products->transform(function ($item) {
+            //   null total quantity
+            $item->total_quantity = $item->total_quantity ?? 0;
+
+            //  Handle last movement date
             if ($item->last_movement) {
                 $item->last_movement = Carbon::parse($item->last_movement)
-                    ->format('Y-m-d h:i A'); 
+                    ->format('Y-m-d h:i A');
+            } else {
+                $item->last_movement = 'No Movement';
             }
+
+            //  Compute availability status
+            if ($item->total_quantity == 0) {
+                $item->availability = 'Out of Stock';
+            } elseif ($item->total_quantity < $item->reorder_level) {
+                $item->availability = 'Low Stock';
+            } else {
+                $item->availability = 'In Stock';
+            }
+
             return $item;
         });
 
-    return response()->json(['inventory' => $products]);
-}
+        return response()->json(['inventory' => $products]);
+    }
+
 
     /**
      * Show the form for creating a new resource.

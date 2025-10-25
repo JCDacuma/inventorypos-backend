@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('stock_code')->unique();
             $table->boolean('is_primary');
             $table->string('location');
+            $table->integer('minimum_level');
             $table->integer('quantity')->default(0);
             $table->string('status');
             $table->dateTime('last_moved');

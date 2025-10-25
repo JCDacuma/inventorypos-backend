@@ -11,6 +11,7 @@ class ProductStock extends Model
         'stock_code',
         'is_primary',
         'location',
+        'minimum_level',
         'quantity', 
         'status', 
         'last_moved', 
