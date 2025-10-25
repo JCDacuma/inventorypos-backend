@@ -52,7 +52,7 @@ class ProductController extends Controller
             'product' => $product
         ], 200);
     }
-   
+
     /**
      * Store a newly created resource in storage.
      */
@@ -133,8 +133,6 @@ class ProductController extends Controller
             }
         }
 
-
-
     /**
      * Update the specified resource in storage.
      */
@@ -208,8 +206,6 @@ class ProductController extends Controller
                 ], 500);
             }
         }
-
-
 
         public function batchupdate(Request $request)
             {

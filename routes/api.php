@@ -9,6 +9,11 @@ use App\Http\Controllers\ProductCategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductUnitController;
 use App\Http\Controllers\ProductSupplierController;
+use App\Http\Controllers\BatchStockController;
+
+//inventory
+Route::get('get-inventory', [BatchStockController::class, 'getInventoryDisplay']);
+
 
 //ProducSupplier pivot
 Route::post('bulk-supplier-unnasign',[ProductSupplierController::class, 'bulkSupplierUnnasign']); //updating
